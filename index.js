@@ -11,6 +11,7 @@ app.use(express.json())
 const client = new MongoClient(process.env.MONGO_URI)
 const db = client.db('blogapp-c12')
 const blogPosts = db.collection('blog-posts')
+const usersDb = db.collection('users')
 
 client.connect()
 console.log('Connected to Mongo')
@@ -27,6 +28,18 @@ app.post('/', async (req, res) => {
 
 	const allPosts = await blogPosts.find().toArray()
 	res.send(allPosts)
+})
+
+// sign up
+app.post('/signup', async (req, res) => {
+	const userAdded = await usersDb.insertOne({ email: req.body.email, password: req.body.password })
+	console.log('user added -> ', userAdded)
+	res.send(userAdded)
+})
+
+// log in
+app.post('/login', (req, res) => {
+	console.log(req.body)
 })
 
 app.listen('8080', () => console.log('Api listening on port 8080 😎'))
