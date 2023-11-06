@@ -38,8 +38,11 @@ app.post('/signup', async (req, res) => {
 })
 
 // log in
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
 	console.log(req.body)
+	const userFound = await usersDb.findOne({ email: req.body.email })
+
+	res.send(userFound)
 })
 
 app.listen('8080', () => console.log('Api listening on port 8080 😎'))
