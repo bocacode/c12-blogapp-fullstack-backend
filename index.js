@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { MongoClient } from 'mongodb'
+import { MongoClient, ObjectId } from 'mongodb'
 
 import 'dotenv/config'
 
@@ -16,12 +16,14 @@ const usersDb = db.collection('users')
 client.connect()
 console.log('Connected to Mongo')
 
+// GET ALL BLOG-POSTS
 app.get('/', async (req, res) => {
 	const allPosts = await blogPosts.find().toArray()
 	console.log('allPosts -> ', allPosts)
 	res.send(allPosts)
 })
 
+// Create blog post
 app.post('/', async (req, res) => {
 	const newBlogPost = { title: req.body.title, content: req.body.content }
 	await blogPosts.insertOne(newBlogPost)
@@ -45,4 +47,22 @@ app.post('/login', async (req, res) => {
 	res.send(userFound)
 })
 
-app.listen('8080', () => console.log('Api listening on port 8080 😎'))
+// Delete one blog post
+app.delete('/:_id', async (req, res) => {
+	// req.query
+	// console.log(req.query)
+	console.log(req.params)
+
+	// const _id = new ObjectId(req.query._id)
+	const _id = new ObjectId(req.params._id)
+	// 1. get item from request
+	// 2. get id from item
+	// 3. we pass id into findOneAndDelete
+	const itemDeleted = await blogPosts.findOneAndDelete({ _id: _id })
+
+	res.send(itemDeleted)
+})
+
+
+
+app.listen(process.env.PORT || 8080, () => console.log('Api listening on port 8080 😎'))
